@@ -1,0 +1,1092 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% I, the copyright holder of this work, release this work into the
+%% public domain. This applies worldwide. In some countries this may
+%% not be legally possible; if so: I grant anyone the right to use
+%% this work for any purpose, without any conditions, unless such
+%% conditions are required by law.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{beamer}
+\usetheme[faculty=sci]{fibeamer}
+\usepackage{polyglossia}  %% By using `czech` or `slovak` as the
+\setmainlanguage{english} %% main locale instead of `english`, you
+%% can typeset the presentation in either Czech or Slovak,
+%% respectively.
+\setotherlanguages{czech, slovak} %% The additional keys allow
+%%
+%%   \begin{otherlanguage}{czech}   ... \end{otherlanguage}
+%%   \begin{otherlanguage}{slovak}  ... \end{otherlanguage}
+%%
+%% These macros specify information about the presentation
+\title{Workshop on Line Following Mechanisms, Algorithms \& Optimization}  %% that will be typeset on the
+\subtitle{A brief introduction to PID controller \& Differential Drive} %% title page.
+\author{Manash \newline EEE-2K12, Khulna University of Engineering \& Technology}
+%% These additional packages are used within the document:
+\usepackage{ragged2e}  % `\justifying` text
+\usepackage{booktabs}  % Tables
+\usepackage{tabularx}
+\usepackage{tikz}      % Diagrams
+\usetikzlibrary{calc, shapes, backgrounds}
+\usepackage{amsmath, amssymb}
+\usepackage{url}       % `\url`s
+\usepackage{listings}  % Code listings
+\frenchspacing
+\begin{document}
+  \frame{\maketitle}
+
+  \AtBeginSection[]{% Print an outline at the beginning of sections
+    \begin{frame}<beamer>[allowframebreaks]
+      \frametitle{Outline for Section \thesection}
+      \tableofcontents[currentsection]
+    \end{frame}}
+
+  \section{Line Following Mechanisms}
+  \subsection{How can we detect a line on a surface?}
+  \begin{frame}{How can we detect a line on a surface?}
+    \framesubtitle{Intro to \alert{Line} Detection}%
+    
+    These are common methods for line detection:
+    
+    \begin{enumerate}
+    	\item{LDR (Light Dependent Resistor) Sensor Array}
+    	\item{IR (Infra-red) Sensor Array}
+    	\item{Camera}
+    \end{enumerate}
+    
+    \begin{alertblock}{Which is the best one?}
+    
+	Every method has its own advantages as well as trade-offs. We will be discussing that shortly.
+    
+    \end{alertblock}
+    
+    
+  \end{frame}
+
+	
+	\subsection{General Purpose Method}
+	\begin{frame}{General Purpose Method}
+	
+	\framesubtitle{\alert{IR Sensors}}
+	
+	Mostly, IR sensors are widely used in building Line Following Robots. Here are some advantages:
+	
+	\begin{alertblock}{Advantages}
+	\begin{enumerate}
+		\item{Ambient light barely affects the performance of an IR}
+		\item{Easy to find out if an IR transmitter working or not (By using a Camera)}
+		\item{Easy to mount}
+		
+		\item{Cheap and available}
+	
+	\end{enumerate}
+	\end{alertblock}
+	
+	\end{frame}
+	
+	\begin{frame}{Trade-offs}
+	
+	It also has some minus points.	
+	
+	\begin{alertblock}{Disadvantages}
+	
+	\begin{enumerate}
+		\item{Different IR sensors on a same array shows different thresholds}
+		\item{Soldering IR may change sensitivity}
+		\item{Consumes a lot of power}
+		\item{Requires uniform DC supply}
+\end{enumerate}		
+	
+	\end{alertblock}
+		
+	\end{frame}
+	
+	\begin{frame}{LDR vs IR}
+	\framesubtitle{Let the battle begin}
+	
+	\begin{alertblock}{Why choosing LDR over IR for LFR is a \textbf{BAD} idea?}
+	
+	Since LDR works as a receiver in a LFR, LED has to play its part as a transmitter. 
+	
+	\bigskip
+	
+	Diffusion of LED light covers a great area which is sometimes good and sometimes bad. For an LFR, it is quite bad. 
+	
+	\bigskip
+	
+	
+	Radial diffusion of LED will have an effect on LDR sensors. Not from its corresponding LED, but from other ones, and we have to consider about the unnecessary reflection from other LEDs too.
+	
+	\bigskip
+	
+	Which will drive the LFR crazy, literally.
+	
+	\end{alertblock}
+	
+	\end{frame}
+	
+	
+	
+	\begin{frame}{LDR vs IR (continues..)}
+	\framesubtitle{Who won? You decide!}
+	
+	\begin{alertblock}{What if I insist using LDR?}
+	
+	Well, if you are that stubborn, use a  partition between each LED-LDR TX-RX pair. But remember, it's a lot easier to buy IR pairs than making partitions.
+	
+	\end{alertblock}
+	
+	\end{frame}
+	
+	\subsection{When you should use Camera}
+		
+	\begin{frame} {When you should choose Camera}
+	\framesubtitle{Getting hands dirty on Digital Image Processing and A.I.}
+		
+	If you are going to make a LFR based on your AI and DIP skill, then using a camera for detecting line is a very good choice.
+	
+	\bigskip 
+	
+	You'd find out eventually that processing video and image takes a lot of time and processing power which a microcontroller can not afford. You might go for Raspberry Pi or similar microcomputer boards though.
+	
+	\bigskip 
+	
+	Camera powered LFR will be really slow, it may get a little bit faster with an improved algorithm but it surely will fail to compete with a PD controller based LFR. 
+	
+	\alert{For competition, using a camera is not recommended.}
+	
+	\end{frame}
+	
+	
+	\subsection{Which IR Array to choose}
+	\begin{frame}{Analog or Digital IR?}
+	
+	\framesubtitle{Always Analog}
+	
+	Before mentioning any IR model, you should always choose \alert{Analog IR} sensors. 
+	
+	\bigskip
+	
+	\alert{Digital IR} only shows 1 or 0, and they are hard to calibrate, on the other hand, \alert{Analog IR} sensors can give analog reading based on your ADC resolution.
+	
+	Aside \alert{Analog and Digital} these IR arrays are great for making LFR.
+
+	
+	\end{frame}
+	
+	\subsection{Recommended IR Sensors}
+	\begin{frame}{Recommended IR sensors}
+	
+	\begin{alertblock}{Pololu QTR-8A Array}
+	
+	High precision, professional and already packaged as an array. 
+	
+	Minus side, header pins have to be soldered by yourself.
+	
+	\end{alertblock}
+
+	\begin{alertblock}{TCRT 5000L}
+	
+	TCRT 5000L (L stands for Long leg) comes as a pair of RX-TX, you'd have to make your own array.
+	
+	\end{alertblock}	
+	
+	\end{frame}
+	
+	\subsection{Circuit Diagrams}
+	\begin{frame}{Circuit Diagrams}
+	
+	\begin{alertblock}{Pololu QTR-8A}
+		
+			\includegraphics[scale=.5]{qtr.jpg}
+	
+	\end{alertblock}	
+	
+	\end{frame}
+	
+	\begin{frame} {Circuit Diagrams}
+	
+	
+	
+	\begin{alertblock}{TCRT 5000}
+	
+		\makebox[\textwidth]{\includegraphics[width=\paperwidth]{tcrt5000.jpg}}
+		
+	\end{alertblock}
+	
+	\end{frame}
+	
+	\subsection{Threshold Calculation}
+	
+	\begin{frame}{What is Threshold of an IR?}
+	 \framesubtitle{And how to calculate}
+	
+	\begin{alertblock}{Threshold}
+	
+	It is a value which can be used to distinguish between black and white surface.
+	
+	\end{alertblock}
+		 
+		 \begin{alertblock}{Calculation Procedure}
+		 
+		 \begin{enumerate}
+			
+			\item{Measure IR sensor value on white surface}
+			
+			\item{Measure IR sensor value on black surface}
+			
+			\item{The average value will be your threshold}		 
+		 
+		 \end{enumerate}
+		 
+		 In formula,
+		 
+		 $Threshold = \frac{White + Black}{2}$
+		 
+		 \end{alertblock}
+	 
+	\end{frame}
+	
+	
+	\subsection{Driving Mechanisms}
+	
+	\subsubsection{DC Gear Motors}
+	
+	\begin{frame}{DC Gear Motors}
+	
+		
+		\begin{alertblock}{Yellow DC Gear Motor}
+			
+			\includegraphics[scale=.3]{yellowdcmotor.jpg}
+		
+		\end{alertblock}
+		
+	
+	\end{frame}
+	
+	
+	\begin{frame}{DC Gear Motors}
+	
+		\begin{alertblock}{Micrometal Gear Motor}
+	
+			\includegraphics[scale=.5]{micrometal.jpg}
+			
+		\end{alertblock}
+	
+	\end{frame}
+	
+	\begin{frame}{DC Gear Motors}
+	
+		\begin{alertblock}{Micrometal Gear with Pololu Wheel}
+			
+			\includegraphics[scale=1]{micrometalwheel.jpg}			
+			
+		\end{alertblock}
+	
+	\end{frame}
+	
+	\subsection{Motor Drivers}
+	
+	\subsubsection{Why do we use motor driver?}
+	
+	\begin{frame}{Motor Drivers}
+	
+		\framesubtitle{Why do we use Motor Drivers?}
+		
+			\includegraphics[scale=.3]{motor-controllers.jpg}
+			
+			
+			\begin{enumerate}
+			
+				\item{Motor Driver acts as an intermediate device between a microcontroller, a power supply and the motors.}
+				
+				\item{Microcontroller can decide but it can not drive motors because of its very limited power (current and voltage) output.}
+				
+				\item{On the other hand, motor driver can provide required current and voltage but can not decide how fast the motor should turn.}
+				
+				\item{That's where PWM comes in, microcontrollers can generate PWM signals which can control speed of motor via motor drivers.}			
+			
+			\end{enumerate}
+		
+		
+			
+	
+	
+	\end{frame}
+	
+	\subsubsection{L298N and L293D}
+	
+	
+	
+	\begin{frame}{Some Motor Drivers}
+		
+		\framesubtitle{L298N is better than L293D}
+		
+		\begin{alertblock}{L293D Motor Driver}
+		
+			\includegraphics[scale=.35]{h-bridge2.jpg}
+		
+		\end{alertblock}
+		
+	\end{frame}
+	
+	
+	\begin{frame}{Some Motor Drivers}
+		
+		\begin{alertblock}{L298N Motor Driver Breakout}
+		
+			\includegraphics[scale=.35]{l298n.jpg}
+		
+		\end{alertblock}
+	
+	\end{frame}
+	
+	\section{Line Following Algorithms}
+	
+	\subsection{Differential Drive}
+	
+	\begin{frame}{Line Following Algorithms}
+	
+		\framesubtitle{2 Wheel Drive Locomotion : Differential Drive}
+		
+		\includegraphics[scale=.35]{dd.jpg}
+		
+		
+	\end{frame}
+	
+	
+	\begin{frame}{Applying Differential Drive}
+	
+	\framesubtitle{Intro to Differential Drive}
+	
+	\bigskip
+
+	\begin{alertblock}{Procedure}
+	
+		\begin{itemize}
+		
+			\item{Take reading from IR arrays, if front IRs are on the line then full speed ahead}
+			
+			\item{If robot is slightly moved LEFT from the line, meaning MOST IR is on RIGHT SIDE , then go slight right}
+			
+			\item{If robot is slightly moved RIGHT from the line, meaning MOST IR is on LEFT SIDE, then go slight left} 
+			
+		
+		\end{itemize}			
+		
+	\end{alertblock}
+				
+	
+	\end{frame}
+	
+	
+	
+	\begin{frame}{Improving Differential Drive Algorithm}
+	
+		\framesubtitle{By Matching Pattern}
+		
+		We can improve basic differential drive algorithm in numerous ways.
+		
+		\bigskip
+		
+		Matching pattern could be one of those. 
+		
+		\begin{alertblock}{Following Line by matching pattern}
+		
+		\begin{itemize}
+			
+			\item{Take note of some patterns encountered by your robot in binary form in an array [1 means on line, 0 means out of line]}
+			
+			\item{Experiment with the patterns and find out the required speed to keep the robot on track}
+			
+			\item{Write some if-else statement for checking those patterns and if a pattern is matched then the robot should use the corresponding speed}
+		
+		\end{itemize}
+		
+		\end{alertblock}	
+	
+	\end{frame}
+	
+	\begin{frame}{Further Improvement}
+	
+		\framesubtitle{`readLine' and `getPosition' Method}
+		
+		\includegraphics[scale=.17]{update_dd.png}
+		
+		
+	
+	\end{frame}
+	
+	\begin{frame}{Implementing `readLine' Method}
+	
+	\begin{enumerate}
+		
+		\item{Create a global array `digitalReading' with the capacity equal to the number of IR sensors used building the robot}
+		
+		\item{Create a global integer `activeSensors' and set it to 0}
+		
+		\item{Create `readLine' function with void input parameter and return type and 
+		
+				\begin{enumerate}
+				
+					\item{At the beginning set `activeSensors = 0'}				
+					\item{Use a `for loop' to read all the sensors and check the reading with predefined threshold if the ir is on the line or not}
+					
+					\item{If checked IR is on line then put 1 in the corresponding index of `digitalReading' array and increase `activeSensors' by 1 else just put 0 (No change in activeSensors)}
+					
+				
+				\end{enumerate}
+				
+			}
+			
+		
+		
+		
+	\end{enumerate}
+		
+	
+	\end{frame}
+	
+	
+	\begin{frame}{Implementing `getPosition' Method}
+	
+	\begin{enumerate}
+		
+		\item{Create `getPosition' method with void input parameter and integer as return parameter}
+		
+		\item{Call `readLine' function}
+		
+		\item{Create a `totalWeight' variable and set it to 0}
+		
+		\item{Create a `for loop' with the range of number of total sensor and within the loop 
+		
+			\begin{enumerate}
+			
+				\item{Update the `totalWeight' variable with '(i + 1) * 1000 * digitalReading[i]' where i is the initialized variable of the `for loop'}
+							
+			
+\end{enumerate}	
+
+}
+
+	\item{return `totalWeight / activeSensors'}				
+		
+	\end{enumerate}
+	
+	\end{frame}
+	
+	
+	\defverbatim[colored]\readLine{
+    \begin{lstlisting}[language=C,tabsize=2]
+	#define numberOfSensors 5
+	#define THRESHOLD 500
+	
+	int digitalReading[numberOfSensors];
+	int sensors[] = {0, 1, 2, 3, 4};
+	int activeSensors = 0;
+	
+	void readLine(void)
+	{
+		activeSensors = 0;
+		for (int i = 0; i < numberOfSensors; i++)
+		{
+			if (analogRead(sensors[i]) > THRESHOLD)
+			{
+			 	activeSensors++;
+			 	digitalReading[i] = 1;
+			} 		
+			else digitalReading[i] = 0;	
+		}
+	}
+			
+
+  \end{lstlisting}}
+	
+
+	\begin{frame}[allowframebreaks]{Implementation of `readLine'} 
+	
+	\readLine
+	
+	
+	\end{frame}
+	
+	
+	
+	\defverbatim[colored]\getPosition{
+    \begin{lstlisting}[language=C,tabsize=2]
+	
+	int getPosition(void)
+	{
+		readLine();
+		int totalWeight = 0;
+		for (int i = 0; i < numberOfSensors; i++)
+		{
+			totalWeight += (i + 1) * 1000 * digitalReading[i];
+		}
+		return totalWeight / activeSensors;
+	}
+			
+
+  \end{lstlisting}}
+  
+  
+  \defverbatim[colored]\updatedDD{
+    \begin{lstlisting}[language=C,tabsize=2]
+	
+	void differentialDrive(void)
+	{
+		int position = getPosition();
+		if (position >= 3500 && position < 4500) forward();
+		else if (position >= 2500 && position < 3500) slightLeft();
+		else if (position >= 4500 && position < 5000) slightRight();
+		else stop();
+	}
+				
+
+  \end{lstlisting}}
+  
+  
+  \defverbatim[colored]\pid{
+    \begin{lstlisting}[language=C,tabsize=2]
+	
+	int maxSpeed = 255;
+	float error = 0;
+	float previousError = 0;		
+	float power = 0;
+	int totalError = 0;
+	
+	int leftSpeed = 0;
+	int rightSpeed = 0;
+	
+	int setPoint = 3500; //Let's assume set point is 3500
+	
+	float kp = 0;
+	float ki = 0;
+	float kd = 0;
+	
+	void PIDLineFollow(void)
+	{
+		int currentPosition = getPosition();
+		previousError = error;
+		error = currentPosition - setPoint;
+		totalError += error;
+		power = (kp * error) + (kd * (error - previousError)) + (ki * totalError);
+		if (power > maxSpeed) power = maxSpeed;
+		else if (power < -1 * maxSpeed) power = -1 * maxSpeed;
+		
+		if (power < 0)
+		{
+			leftSpeed  = maxSpeed - abs((int)power);
+			rightSpeed = maxSpeed;
+		}
+		else 
+		{
+			leftSpeed = maxSpeed;
+			rightSpeed = maxSpeed - int(power);
+		}
+		forward(leftSpeed, rightSpeed);
+	}
+
+  \end{lstlisting}}
+  
+  
+  \defverbatim[colored]\tuningHack{
+    \begin{lstlisting}[language=C,tabsize=2]
+	
+	#define input(pin) (pinMode(pin, INPUT_PULLUP))	
+	#define input_pot(pin) (pinMode(pin, INPUT))
+	
+	#define INCR_SIZE 0.01
+	
+	float Kp = 0;
+	float Kd = 0;
+	float Ki = 0;
+		
+	int buttons[] = {2, 3, 4}; //For Kp, Ki and Kd
+	int potentiometers[] = {A3, A4, A5}; //Kp, Ki and Kd
+	
+	void increasePIDByButton(void)
+	{
+	   if (digitalRead(buttons[0]) == LOW)
+	   {
+	   		Kp += INCR_SIZE;
+	   		delay(250);
+	   }
+	   
+	   if (digitalRead(buttons[1]) == LOW)
+	   {
+	   		Ki += INCR_SIZE;
+	   		delay(250);
+	   }
+	   
+	   if (digitalRead(buttons[2]) == LOW)
+	   {
+	   		Kd += INCR_SIZE;
+	   		delay(250);
+	   }
+	}   			
+	
+	void increasePIDByPot(void)
+	{
+		Kp = analogRead(potentiometers[0]);
+		Ki = analogRead(potentiometers[1]);
+		Kd = analogRead(potentiometers[2]);
+	}
+	
+	
+	void setup()
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			input(buttons[i]);
+			input_pot(potentiometers[i]);
+		}
+	}
+	
+	void loop()
+	{
+		increasePIDByButton();
+		increasePIDByPot();
+		PIDLineFollow();
+	}
+
+  \end{lstlisting}}
+  
+  
+  \defverbatim[colored]\turnLeft{
+    \begin{lstlisting}[language=C,tabsize=2]
+	
+	void turnLeft(void)
+	{
+	    bool takeLeftTurn = false;
+		if (analogRead(leftEdgeSensor) > THRESHOLD)
+		{
+			takeLeftTurn = true;
+		}
+		
+		if (takeLeftTurn)
+		
+		{
+			while(1)
+			{
+				forward(0 , rightSpeed); //Robot will turn left
+				if ( getPosition() > 0 ) 
+				{
+					takeLeftTurn = false;
+					break;
+				}
+				
+			}
+		}
+	}
+				
+
+  \end{lstlisting}}
+  
+  
+  
+  \begin{frame}[allowframebreaks]{Implementation of `getPosition'}
+  
+  \getPosition
+  
+  
+  \end{frame}
+  
+  
+  \begin{frame}[allowframebreaks]{Wrapping it all up}
+  \framesubtitle{Why and How?}
+  
+  \begin{alertblock}{How `getPosition' will help?}
+  
+  	\begin{enumerate}
+		
+		\item{Now we do not have to consider all possible patterns, just the positional value will be enough}
+		
+		\item{We can find out the possible positional values and examine which PWM combinations are required to keep the robot on track}
+		
+		
+		\item{`getPosition' will come in handy implementing the PID controller}
+		  	
+  	
+  	\end{enumerate}
+  	
+  	\end{alertblock}
+  	
+  	
+  	\begin{alertblock}
+  	
+  	Let us consider an example:
+  	
+  		\updatedDD
+  	
+  	\end{alertblock}
+  
+  \end{frame}
+  
+  
+  \subsection{Introduction to Proportional Integral Derivative Controller}
+  
+  \begin{frame}[allowframebreaks]{Introduction to PID Controller}
+  	\framesubtitle{Open Loop vs Closed Loop}
+  	
+  	\begin{alertblock}{Open Loop Control System (Differential Drive)}
+  	
+  	An open-loop controller, also called a non-feedback controller, is a type of controller that computes its input into a system using only the current state and its model of the system.
+  	\bigskip
+  	
+  	\includegraphics[scale=.9]{openloop.JPG}
+  	
+  	
+  	\end{alertblock}
+
+		\bigskip
+  	
+  	\begin{alertblock}{Closed Loop Control System (PID Controller)}
+  	
+  	A Closed-loop Control System, also known as a feedback control system is a control system which uses the concept of an open loop system as its forward path but has one or more feedback loops (hence its name) or paths between its output and its input.
+  	
+  	\bigskip
+  	
+  	\includegraphics[scale=.5]{closedloop.png}
+  	
+  	\end{alertblock}
+  	
+  	
+  	
+
+  \end{frame}
+  
+  \begin{frame}[allowframebreaks]{Key-Concepts}
+  
+  \framesubtitle{Set-point, error, overshoot, settling time, oscillation}
+  
+  \begin{alertblock}{Set-point}
+  
+  
+   Set point is the desired value, if we want to keep our line follower robot at `3500' positional value then the Set point will be 3500.
+   
+   \end{alertblock}
+   
+   
+   \begin{alertblock}{Error}
+   
+		Difference between Set-point and current value. If set-point is 3500 and current value is 4000 then the error is -500.   
+   
+   \end{alertblock}
+   
+   \begin{alertblock}{Settling Time}
+   
+   	Settling time is the time required for an output to reach and remain within a given error band following some input.
+		   
+		   
+		   \includegraphics[scale=.4]{keyconcept.jpg}
+   
+   \end{alertblock}
+   
+   \begin{alertblock}{Oscillation}
+   
+		Oscillation is the continuous deviation from set-point with a period of time. 
+		
+		\bigskip		
+		
+		Oscillation in a line follower robot
+		
+		\includegraphics[scale=.1]{untuned.png}      
+   
+   \end{alertblock}
+   
+   \begin{alertblock}{Tuning}
+		
+		Tuning is the method of acquiring the value of PID constants at which PID controller works as expected.   
+   
+   \end{alertblock}
+  
+  \end{frame}
+  
+  \begin{frame}{PID Formula}
+  \framesubtitle{\& Controller Diagram}
+ 		
+ 	$PID = K_{p}  e + K_{i}   \int e(\tau) d\tau + K_{d}  \frac{de(t)}{dt} $
+ 	
+ 	Where, $K_{p}$, $K_{i}$ and $K_{d}$ are positive.  
+ 	
+ 	\begin{alertblock}{Controller Diagram}
+ 		
+ 		\includegraphics[scale=.5]{pid.jpg}
+ 	
+ 	\end{alertblock}
+  
+  \end{frame}
+  
+  
+  \begin{frame}{What will PID calculate for LFR?}
+  
+  	Perfectly tuned PID controller will calculate how much speed of the motors you need to reduce from motors \alert{(sign will determine from which motor)} to keep the robot on track. Which we have been calculating from our common sense until now.
+  	
+  	\begin{alertblock}{I/O of PID}
+  	
+	\alert{Input: } Current Positional Value
+	
+	\bigskip
+	
+	\alert{Output: } Calculated speed which will be reduced from the motor \alert{(Sign will determine from which motor)}
+  	
+  	\end{alertblock}
+  	
+  	
+  	
+  
+  \end{frame}
+  
+  
+  \begin{frame}[allowframebreaks]{Implementing PID Controller}
+  \framesubtitle{Algorithm}
+  
+  \begin{enumerate}
+		
+		\item{First of all, you have to determine set point and put the value on a global variable}
+		
+		\item{Create these \alert{global} variables Kp, Ki, Kd, error, totalError, power, previousError and set it all to 0} 
+		
+		\item{Create `PID' function and within the function:
+		
+			\begin{itemize}
+					
+				\item{Create a local variable `currentPosition' and store value of current position by calling `getPosition' function}
+				
+				\item{Store `error' to `previousError'}
+				
+				\item{Subtract `setPoint' from `currentPosition' and store it to `error'}
+				
+				\item{Update `totalError' by error}
+				
+				\item{Apply PID formula for `power', $power = Kp * error + {kd * (error - previousError)} + (ki * totalError)$}
+				
+				\item{If the calculated `power' is greater than the maximum value of speed (here 255) then set `power' equal to the maximum value (power = 255)}
+				
+				\item{If the calculated `power' value is less than the minimum value of speed (here -255) then set `power' equal to the minimum value (power = -255)} 	
+				
+				\item{If power is negative then subtract speed from left motor (depends) else subtract speed from right motor}
+				
+				\item{Apply current reduced speed to follow the line}		
+			
+			\end{itemize}
+			
+			}
+  
+  \end{enumerate}
+  
+  \end{frame}
+  
+  \begin{frame}[allowframebreaks]{Implementation of PID Controller}
+  
+  \framesubtitle{Example Code}
+  
+  \pid
+  
+  \end{frame}
+  
+  \begin{frame}[allowframebreaks]{Tuning}
+  	\framesubtitle{Tuning of $K_{p}, K_{i}, K_{d}$}
+  	
+  	
+  	Once you have PID running in your robot, you will probably notice that it still doesn't follow the line properly. It may even perform worse than it did with just proportional!  The reason behind this is you haven't tuned the PID routine yet.  
+		\bigskip
+		
+		PID requires the Kp, Ki and Kd factors to be set to match your robot's characteristics and these values will vary considerably from robot to robot.  Unfortunately, there is no easy way to tune PID. 
+		
+		\bigskip
+		
+		It requires manual trial and error until you get the desired behaviour.  There are some basic guidelines that will help reduce the tuning effort.
+  	
+  	\begin{itemize}
+  		
+		
+		
+		
+\item{Start with Kp, Ki and Kd equalling 0 and work with Kp first. Try setting Kp to a value of 1 and observe the robot. The goal is to get the robot to follow the line even if it is very wobbly. If the robot overshoots and loses the line, reduce the Kp value. If the robot cannot navigate a turn or seems sluggish, increase the Kp value.}
+
+
+\item{Once the robot is able to somewhat follow the line, assign a value of 1 to Kd (skip Ki for the moment). Try increasing this value until you see lesser amount of wobbling.}
+
+
+\item{Once the robot is fairly stable at following the line, assign a value of 0.5 to 1.0 to Ki. If the Ki value is too high, the robot will jerk left and right quickly. If it is too low, you won't see any perceivable difference.  Since Integral is cumulative, the Ki value has a significant impact. You may end up adjusting it by .01 increments.}
+
+
+\item{Once the robot is following the line with good accuracy, you can increase the speed and see if it still is able to follow the line. Speed affects the PID controller and will require retuning as the speed changes.}
+  		
+  		
+  	
+  	\end{itemize}
+  	
+  	
+  	\begin{alertblock}{Tuning Hack}
+  	
+		Kp, Ki and Kd may need to be changed frequently until you find a perfect value. Changing value within the code and again uploading it for testing is not always the best solution. Instead you can either use 3 buttons for these three constants or three potentiometers with ADC channel. With each push of a button, a small fractional value will be added to the current value. Same theory can be applied with the potentiometers.
+		
+		
+		  	
+  	
+  	\end{alertblock}
+  	
+  	\begin{alertblock}{A Simple Code Snippet Explaining Tuning Hack}
+  	
+  	\end{alertblock}
+		\tuningHack  	
+  	
+  	
+  
+  \end{frame}
+  
+  \begin{frame}{Oscillation after fine tuning!}
+  \framesubtitle{Smooth!}
+  
+  	\includegraphics[scale=.3]{tuned.png}
+  
+  \end{frame}
+  
+  \begin{frame}{PID Controller in other robots}
+  \framesubtitle {Engineering Marvels with PID at heart}
+  
+  
+  \begin{enumerate}
+		
+		\item{Self-Balancing Bot complete project from Cornell University : \url{https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/}}
+		
+		\item{DIY Stewart platform with 6 DOF: 
+		\url{http://bit.ly/1rvYUhP}}  
+		
+		\item{PID Controlled QuadCopter:  \url{https://github.com/vjaunet/QUADCOPTER_V2}}
+  
+  \end{enumerate}
+  
+  
+  \end{frame}
+  
+  \begin{frame}{Applying PID in Wall/Cave Following Robots}
+  
+  \framesubtitle{DIY}
+  
+  	A wall/cave follower robot can be made easily with PID algorithm. Try to make one!
+  
+  \end{frame}
+  
+  
+  \section{Line Follower Optimization}
+  
+  \subsection{Arduino Hack}
+  \begin{frame}[allowframebreaks]{Arduino Hack: Compiling code in Optimization Level 2}
+  \framesubtitle{-O2 is recommended}
+  	
+  	Without any optimization option, the compiler's goal is to reduce the cost of compilation and to make debugging produce the expected results. 
+			 	
+
+	\begin{itemize}
+		
+		\item{\alert{-O0} - No optimization, but has the fastest compilation time}
+		
+		\item{\alert{-O1} - Moderate optimization}
+		
+		
+		\item{\alert{-O2} - Full Optimization; generates highly optimized code with slowest compilation time}
+		
+		\item{\alert{-O3} - Full Optimization as `-O2' also uses more aggressive automatic inlining of subprograms.}
+		
+		\item{\alert{-Os (default)} - Optimized Space Usage}	
+	
+	\end{itemize}
+
+  
+  
+  \end{frame}
+  
+  \begin{frame}[allowframebreaks]{How to change the Optimization Level}
+  	\framesubtitle{Works with the latest Arduino IDE}
+  	
+  		
+  		\begin{itemize}
+
+  	
+		
+			\item{Open Arduino IDE}
+			
+			\item{Go to `File > Preferences'}
+		
+			\item{Click on \texttt{C:/Users/YourName/AppData/Local/Arduino15/preferences.txt}}
+			
+			\item{Close the IDE and go to \texttt{packages > arduino >  hardware > avr > 1.6.X}}	
+				
+			\item{Open \texttt{platform.txt}}
+		
+			\item{Replace all  \alert{-Os} with \alert{-O2}}
+		
+			\item{Save the file and close it}
+		
+			\item{Done!}
+  		
+  		\end{itemize}
+  	
+  	
+  	\end{frame}
+ 
+ 
+ 	\begin{frame}{Where you should use PID and where you should not}
+ 	\framesubtitle{PID won't save you from hard turns!}
+ 	
+ 		PID Controller works unbelievably well in smooth turns and twisted lines. But it won't work at hard/ sharp angular turns. 
+ 		
+ 		\bigskip
+ 		
+ 		To overcome this problem you may need to use your own method. In general you can follow this guideline.
+ 		
+ 		\begin{itemize}
+ 		
+			\item{Create more functions such as \texttt{turnLeft()}, \texttt{turnRight()} for detecting those turns and taking appropriate action}
+			
+			\item{Call those functions in the \texttt{loop()} function} 		
+			
+			\item{Why are we calling the turn functions in the loop? Because we don't know when the robot should take turns, it is a good idea to check for turns as the bot keeps going}
+			
+ 		
+ 		\end{itemize}
+ 		
+ 	
+ 	\end{frame}
+ 	
+ 	
+ 	\begin{frame}[allowframebreaks]{Implementation of turn taking functions}
+ 	
+ 	\begin{itemize}
+		
+		\item{It is always a good idea to have extra IR sensors at the edge of the array which have not been used in PID controller.}
+		
+		\item{Then you can detect turns by checking the edge IR sensors only}
+		
+		 		
+ 		
+ 	\end{itemize}
+ 	
+ 		\turnLeft
+ 		
+ 	It is just a basic implementation. You may need to change the code.
+ 	
+ 	\end{frame}
+ 	
+ 	
+ 	\begin{frame}{Note}
+ 	\framesubtitle{Some extra tips}
+ 	
+ 	\begin{itemize}
+ 		
+ 		\item{PD Algorithm is recommended for line following robots}
+ 		\item{It is better to write a library rather writing same code over and over again}
+ 		
+ 		\item{Try to use OOP Paradigm for building library}
+ 		
+ 		
+ 		
+ 	\end{itemize}
+ 	
+ 	\end{frame}
+  
+
+\end{document}
