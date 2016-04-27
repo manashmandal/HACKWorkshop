@@ -1,1 +1,1 @@
-# HACKWorkshop
+# HACK Workshop
