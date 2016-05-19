@@ -1,0 +1,389 @@
+% 	Name		:: 	sthlm Beamer Theme  HEAVILY based on the hsrmbeamer theme (Benjamin Weiss)
+%	Author		:: 	Mark Hendry Olson (mark@hendryolson.com)
+%	Created		::	2013-07-31
+%	Updated		::	June 18, 2015 at 08:45
+%	Version		:: 	1.0.2
+%	Email		:: 	hendryolson@gmail.com
+%	Website		:: 	http://v42.com
+%
+% 	License		:: 	This file may be distributed and/or modified under the
+%                  	GNU Public License.
+%
+%	Description	::	This presentation is a demonstration of the sthlm beamer
+%					theme, which is HEAVILY based on the HSRM beamer theme created by Benjamin Weiss
+%					(benjamin.weiss@student.hs-rm.de), which can be found on GitHub
+%					<https://github.com/hsrmbeamertheme/hsrmbeamertheme>.
+
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%
+%        LOADING DOCUMENT
+%
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\documentclass[newPxFont]{beamer}
+\usetheme{sthlm}
+\usepackage{listings}
+%\usecolortheme{sthlmv42}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%        LOADING PACKAGES
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\usepackage[utf8]{inputenc}
+
+\usepackage{chronology}
+
+\renewcommand{\event}[3][e]{%
+  \pgfmathsetlength\xstop{(#2-\theyearstart)*\unit}%
+  \ifx #1e%
+    \draw[fill=black,draw=none,opacity=0.5]%
+      (\xstop, 0) circle (.2\unit)%
+      node[opacity=1,rotate=45,right=.2\unit] {#3};%
+  \else%
+    \pgfmathsetlength\xstart{(#1-\theyearstart)*\unit}%
+    \draw[fill=black,draw=none,opacity=0.5,rounded corners=.1\unit]%
+      (\xstart,-.1\unit) rectangle%
+      node[opacity=1,rotate=45,right=.2\unit] {#3} (\xstop,.1\unit);%
+  \fi}%
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%        BEAMER OPTIONS
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+%\setbeameroption{show notes}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%
+%	PRESENTATION INFORMATION
+%
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\title{Introduction to Qt C++ Framework and Arduino}
+\subtitle{Supplementary course}
+%\date{\small{\jobname}}
+\date{}
+\author{\texttt{by Manash, EEE-2K12, KUET}}
+\institute{\textit{Khulna University of Engineering \& Technology}}
+
+\hypersetup{
+pdfauthor = {Manash Kumar Mandal: manashmndl@gmail.com},
+pdfsubject = {},
+pdfkeywords = {},
+pdfmoddate= {D:\pdfdate},
+pdfcreator = {}
+}
+
+\begin{document}
+
+
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%
+%	TITLE PAGE
+%
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\maketitle
+
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%
+%	TABLE OF CONTENTS: OVERVIEW
+%
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\section{C++ Primer}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	FRAME:
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\begin{frame}[allowframebreaks]{Quick Review of C++}
+
+
+\begin{block}{Topic Overview in C++ Primer Section}
+	\begin{itemize}
+	    \item Header and Source File
+		\item Dynamic Memory Allocation 
+		\item Avoiding Memory Leakage
+		\item Struct
+		\item Class
+		\item Object Oriented Programming Basics
+		\item Generics
+		\item Namespace
+		\item Distributing Class between a Header and a Source File
+	\end{itemize}
+\end{block}
+
+\end{frame}
+
+
+\subsection{Header and Source File}
+
+\begin{frame}[allowframebreaks]{Header and Source file and their Application}
+
+\begin{exampleblock}{Reason behind Header and Source Files}
+
+The main reason would be for separating the interface from the implementation. 
+
+The header declares \alert{"what"} a class (or whatever is being implemented) will do, while the cpp file defines \alert{"how"} it will perform those features.
+
+\end{exampleblock}
+
+\vspace{8em}
+
+\begin{alertblock}{How splitting helps?}
+
+\begin{itemize}
+    \item {This reduces dependencies so that code that uses the header doesn't necessarily need to know all the details of the implementation and any other classes/headers needed only for that.}
+    \item {This will reduce compilation times and also the amount of recompilation needed when something in the implementation changes.}
+\end{itemize}
+
+\end{alertblock}
+
+\end{frame}
+
+\subsection{How to Create a Header File and Use it}
+
+\begin{frame}{How to Create a Header file and use it}
+
+Following these steps will do,
+
+\begin{enumerate}
+    \item {In your C++ project directory, create a file with extension \alert{.h}, example \alert{printArray.h}}
+    \item {Now you need to use \alert{Guard Block} with the similar name as the header file}
+    \item {Within the Guard Block put your code}
+    \item {In your source file, call the header file using \alert{#include} directive}
+    \end{enumerate}
+
+\end{frame}
+
+\subsection{Header File Example}
+
+\begingroup
+\setbeamercolor{background canvas}{bg=\cnLightBlue}
+\begin{frame}[containsverbatim]{Simple.h}
+
+Let's assume we have created a \alert{Simple.h} header file in our project directory
+
+\begin{verbatim}
+    //Let's say the name of the header is Simple.h
+    #ifndef SIMPLE_H_
+    #define SIMPLE_H_
+    
+    //Adding the standard library
+    #include <stdio.h>
+    int add(int a, int b);
+    void print(char* a_string);
+    #endif
+\end{verbatim}
+
+\end{frame}
+\endgroup
+
+\begingroup
+\setbeamercolor{background canvas}{bg=\cnLightGreen}
+\begin{frame}[containsverbatim]{Simple.c}
+
+Now we have to implement the functions in this \alert{Simple.c} file
+
+
+\begin{verbatim}
+//Now adding our simple.h
+#include "Simple.h"
+    
+//Implementation of the functions
+int add(int a, int b) { return a + b; }
+void print(char *a_string) { printf("%s", a_string); }
+
+\end{verbatim}
+
+\end{frame}
+\endgroup
+
+\begingroup
+\setbeamercolor{background canvas}{bg=\cnLightRed}
+\begin{frame}[containsverbatim]{main.c}
+
+Let's try out our very own \alert{Simple.h} header file
+
+\begin{verbatim}
+#include <stdio.h>
+//Yeah, we are going to add only Simple.h
+#include "Simple.h"
+
+int main(void)
+{
+   int c = add(2, 3);
+   char* str = "Welcome to the workshop!";
+   print(str);
+}
+\end{verbatim}
+
+\end{frame}
+\endgroup
+
+\subsection{Dynamic Memory Allocation}
+
+\begin{frame}[allowframebreaks]{Dynamic Memory Allocation in C++}
+
+\begin{exampleblock}{Why do we need Dynamic Memory Allocation?}
+
+\begin{itemize}
+\item Many times, you are not aware in advance how much memory you will need to store particular information in a defined variable and the size of required memory can be determined at run time.
+
+\item You can allocate memory at run time within the heap for the variable of a given type using a special operator in C++ which returns the address of the space allocated. This operator is called \alert{new} operator.
+    
+\end{itemize}
+
+
+\end{exampleblock}
+
+\vspace{1em}
+
+Memory allocation using \alert{new} operator 
+
+\begin{verbatim}
+
+int *integer;
+
+integer = new int(10);
+
+//Dereferencing the variable for getting actual value from the address
+
+std::cout << *integer;
+
+\end{verbatim}
+Memory Allocation for \alert{Arrays}
+
+\begin{verbatim}
+#define ARRAY\_SIZE 20
+
+char *char\_array;
+
+char\_array = new char[ARRAY\_SIZE];
+
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Avoiding Memory Leakage}
+
+\begin{exampleblock}{What is Memory Leakage?}
+
+Memory leaks are blocks of storage that are allocated but never freed by a program, even when no longer in use. Misuse of dynamic memory allocation may lead to memory leakage.
+
+\end{exampleblock}
+
+\begin{alertblock}{How to prevent memory leakage?}
+
+If you're programming in OOP paradigm, it is a good practice to write memory freeing statements in destructors, which will be discussed later on. By using \alert{delete} keyword, memory of a pointer can be freed.
+
+
+\end{alertblock}
+
+A simple example of freeing a pointer array
+
+\begin{verbatim}
+
+int *int\_array = new int[10];
+
+for (int i = 0; i < 10; i++)\{
+
+         int\_array[i] = i * 5;
+    
+\}
+
+//[] was used for freeing the integer array
+
+delete[] int\_array;
+
+\end{verbatim}
+
+\end{frame}
+
+\subsection{Structures in C++}
+
+\begin{frame}[allowframebreaks]{Composite Data Type : Struct}
+
+A composite data type consists of various types of data. Let's say I have a \alert{Box}, and in the box I store my books, pens and a RC car. 
+
+Now I can treat the box as a variable, within the \alert{Box} variable, book, pen and a RC car type variables reside too. But I can access those variables at any time by opening the box. 
+
+For the sake of explanation, we can call the box a composite type object which carries fundamental objects like book, RC car and pens.
+
+\vspace{2em}
+
+\begin{exampleblock}{If the box were a \alert{Structure} in my program, how would I access those objects (pen, book, RC car) in it?}
+
+\begin{verbatim}
+    //Creating a box type structure [let's assume as soon as I create a Box variable, an RC car, a book and a pen gets created automatically. 
+
+    Box box;
+    
+    //Accessing the objects within the box
+    
+    cout << box.RC\_car << endl;
+    
+    cout << box.pen << endl;
+    
+    cout << box.book << endl;
+    
+\end{verbatim}
+
+\end{exampleblock}
+
+
+\end{frame}
+
+\begingroup
+\setbeamercolor{background canvas}{bg=\cnLightGreen}
+
+\begin{frame}[containsverbatim, allowframebreaks]{Struct Example}
+Creating a \alert{struct}
+\begin{verbatim}
+    struct Box {
+        char pen;
+        char[30] book;
+        int RC_car;
+    }
+    //main function
+    int main(void){
+        Box box;
+        box.pen = 'M';
+        box.book = "Algorithms by CLRS";
+        box.RC_car = 10;
+        cout << box.pen << endl 
+             << box.book << endl
+             << box.RC_car << endl;
+    }
+\end{verbatim}
+
+\end{frame}
+
+\endgroup
+
+\subsection{Class}
+
+\begin{frame}[allowframebreaks]{Class}
+
+\alert{Class} can also be considered as a composite data type like \alert{struct}. But it is an updated version of struct. That is why class comes with a lot of extra features.
+
+\begin{exampleblock}{Features of Class}
+    \begin{itemize}
+        \item{Data Encapsulation : Access Modifiers}
+        \item{Inheritable}
+        \item{Supports polymorphism}
+        \item{Supports generics}
+    \end{itemize}
+\end{exampleblock}
+
+\end{frame}
+
+\end{document}
