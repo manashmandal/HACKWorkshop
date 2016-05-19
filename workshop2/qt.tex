@@ -116,7 +116,6 @@ pdfcreator = {}
 		\item Class
 		\item Object Oriented Programming Basics
 		\item Generics
-		\item Namespace
 		\item Distributing Class between a Header and a Source File
 	\end{itemize}
 \end{block}
@@ -352,7 +351,7 @@ Creating a \alert{struct}
         char pen;
         char[30] book;
         int RC_car;
-    }
+    };
     //main function
     int main(void){
         Box box;
@@ -371,19 +370,379 @@ Creating a \alert{struct}
 
 \subsection{Class}
 
-\begin{frame}[allowframebreaks]{Class}
+\begin{frame}[allowframebreaks, containsverbatim]{Class}
 
-\alert{Class} can also be considered as a composite data type like \alert{struct}. But it is an updated version of struct. That is why class comes with a lot of extra features.
+\alert{Class} can also be considered as a composite data type like \alert{struct}. But class is an updated version of it. That is why class comes with a lot of extra features.
 
 \begin{exampleblock}{Features of Class}
     \begin{itemize}
         \item{Data Encapsulation : Access Modifiers}
         \item{Inheritable}
+        \item{Constructors}
+        \item{Destructors}
+        \item{Functoion Overloading}
+        \item{Operator Overloading}
         \item{Supports polymorphism}
         \item{Supports generics}
+        \item{...}
     \end{itemize}
 \end{exampleblock}
 
+
+Let's talk about some functionality of class
+
+\alert{Constructors:}
+Constructors are functions in a class sharing the same name with the class itself and do not return anything. But when the object is created, these functions are called automatically. 
+\begin{verbatim}
+    class Student {
+    //private and public are access modifiers
+    private:
+        string name;
+        int id;
+    public:
+        //Constructor
+        Student(string n, string i){
+            name = n;
+            id = i;
+        }
+        //Class can have it's own methods (functions)
+        void printDetails(void){
+            cout << "Name: " << name
+                 << endl << "ID: " << 
+                 << id << endl;
+        }
+    };
+    int main(){
+        Student manash("Manash", 1203043);
+        manash.printDetails(); }
+\end{verbatim}
+
+From the above example, I created a student variable and passed the parameters without calling any function. Then, by calling the \alert{printDetails()} function it can be confirmed that the private fields were assigned with the value which were passed when the student variable was created.
+
+\vspace{15em}
+
+\begin{block}{Another way of assigning values to fields}
+    
+    \begin{verbatim}
+        class Student {
+            private:
+                string name;
+                int id;
+            public:
+                //This one works the same way before
+                Student (string n, int i) : name(n), id(i) {}
+                ...
+        };
+    \end{verbatim}
+    
+\end{block}
+
+    \begin{block}{Accessing Fields of a class}
+        \begin{enumerate}
+            \item{Same as struct but, private fields can not be accessed simply by '.' notation}
+            \item{Public methods of a class can access the private fields, so the best practice is to use get-set method for retrieving and  assigning values}
+        \end{enumerate}
+        
+    \end{block}
+    
+
 \end{frame}
+
+\begin{frame}[allowframebreaks, containsverbatim]{Scope Resolution Operator (::)}
+
+\alert{Functions} and \alert{Static Variables} can be defined within the class or outside the class. Here is an example of defining methods outside of class.
+
+\alert{Outside of Class}
+\begin{verbatim}
+class Student {
+    private:
+        string name;
+        int id;
+    public:
+        //Just the interface of the function
+        Student(string name, int id);
+        printDetails(void);
+};
+
+class Teacher {
+    private:
+        string subject;
+    public:
+        Teacher(string subject);
+        void teach();
+};
+
+void Student::printDetails(void){
+    cout << "Name: " << name << endl
+         << "Id: " << id << endl;
+}
+    
+Student::Student(string name, int id){
+    this->name = name;
+    this->id = id;
+}
+
+Teacher::Teacher(string subject){
+    this->subject = subject;
+}
+
+void Teacher::teach(){
+    cout << "I teach " << this->subject << endl;
+}
+    
+\end{verbatim}
+
+We may come to a conclusion that with the help of \alert{Scope Resolution Operator} we can identify the classes with corresponding functions. This Scope Resolution Operator is also helpful for namespace selection.
+
+\end{frame}
+
+
+\begin{frame}[containsverbatim, allowframebreaks]{Object Oriented Programming Basics}
+\alert{Inheritance:}
+Let's create a class called Dad.
+
+\begin{verbatim}
+class Dad{
+    private:
+        string sur_name;
+        int wealth;
+    public:
+        Dad(string _surname, int _wealth){
+            sur_name = _surname;
+            wealth = _wealth;
+        }
+        
+        void printDetails(void){
+            cout << "Sur name: " << sur_name << endl
+                 << "Wealth: " << wealth << endl;
+            }
+    };
+\end{verbatim}
+
+Now let's create a class named Son which will inherit class Dad
+
+\begin{verbatim}
+class Son : public Dad {
+    public:
+        Son(string sur_name, int wealth) :
+        Dad(sur_name, wealth) {}
+    }
+\end{verbatim}
+
+I haven't created any method called \alert{printDetails} in class \alert{Son}, still I can call the function and print details since class Son inherits all the fields and methods of class Dad.
+
+\begin{verbatim}
+//In main.cpp
+int main(){
+    Son son("sur_name", 10000);
+    son.printDetails();
+}
+\end{verbatim}
+
+\vspace{16em}
+
+\begin{verbatim}
+Son(string sur_name, int wealth) :
+        Dad(sur_name, wealth) {}
+\end{verbatim}
+
+This statement means \alert{Son} class will call the superclass constructor and set the variables. This is a way of calling constructors of superclass.
+
+\end{frame}
+
+\endgroup
+
+\section{'this' keyword}
+
+\begin{frame}[containsverbatim, allowframebreaks]{Use of 'this' keyword}
+
+\alert{'this'} keyword is used to refer the object itself.
+
+\begin{verbatim}
+class Dummy {
+  public:
+    bool isitme (Dummy& param);
+};
+
+bool Dummy::isitme (Dummy& param)
+{
+  if (&param == this) return true;
+  else return false;
+}
+
+int main () {
+  Dummy a;
+  Dummy* b = &a;
+  if ( b->isitme(a) )
+    cout << "yes, &a is b\n";
+  return 0;
+}
+\end{verbatim}
+
+\end{frame}
+
+
+
+\section{Generics}
+
+
+
+\begin{frame}[containsverbatim, allowframebreaks]{Introduction to Generics}
+In short, generics means independence of data type. Let's see how it works.
+
+Let's assume I've given a task to write a console application in C++ to add two data types. These data types may be float, double, integer or string (for string this addition operation can be called concatenation) maybe. To accomplish the task, you may think that I need to do something like this! (using function overloading)
+\begin{verbatim}
+//Adds ints
+int add(int a, int b) { return a + b; }
+
+//You guessed it!
+float add(float a, float b) { return a + b; }
+
+double add(double a, double b) { return a + b; }
+
+std::string add(std::string a, std::string b) {
+    return a + b; 
+}
+//.... The list goes on and on
+\end{verbatim}
+
+Suppose there are hundreds of data types, then I need to write hundreds of these functions for each data type which is not feasible. By using C++ generic, I can write a template based function which will handle all type of data types! Let's see how it's done!
+
+\begin{verbatim}
+template <typename any_type>
+any_type add (any_type a, any_type b)
+{
+    return a + b;
+}
+\end{verbatim}
+
+Traditionally it's written in this form
+
+\begin{verbatim}
+template <typename T>
+T add(T a, T b)
+{
+    return a + b;
+}
+\end{verbatim}
+
+For the time being, let's believe that \alert{typename} keyword is used for defining general data type. Not only functions but also \alert{Class}es can also be generic.
+
+\begin{block}{Standard Template Library Example (Class) : Vector}
+Vectors are resizable arrays. Here is a short example.
+\end{block}
+
+\alert{Example:}
+\begin{verbatim}
+//this one can store ints
+vector <int> int_vector;
+
+vector <char> char_vector;
+
+for (int i = 0; i < 100; i++){
+    int_vector.push_back(i);
+    char_vector.push_back(char(i));
+}
+
+//Printing the value
+for (int i : int_vector){
+    cout << i << endl;
+}
+
+for (char a : char_vector){
+    cout << a << endl;
+}
+
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[containsverbatim, allowframebreaks]{Distributing Class between Header and Source File}
+
+This concept will be useful for working with Qt Framework. Because, it is easier to maintain codes with separate files rather than one file containing all the codes. Let's see how can we split class function definitions and interface between header and source file.
+
+\alert{StudentProfile.h}
+\begin{verbatim}
+#ifndef STUDENTPROFILE_H
+#define STUDENTPROFILE_H
+#include <iostream>
+
+using std::string;
+
+class StudentProfile
+{
+private:
+    string name;
+    int id;
+    float cgpa;
+    static int NUMBER_STUDENT_PROFILE_CREATED;
+public:
+    StudentProfile(string name, int id, float cg);
+    string getName(void) const;
+    int getId(void) const;
+    float getCGPA(void) const;
+    static int getTotalProfileCount(void);
+};
+
+#endif // STUDENTPROFILE_H
+\end{verbatim}
+
+Here \alert{static} variables are called Class Variables, because these variables do not belong to individual object of class, so this can not be accessed via object of a class. Static variables must be accessed using the Class itself. 
+
+\alert{NUMBER\_STUDENT\_PROFILE\_CREATED} static variable was used to keep the count of the number of profile.
+
+\alert{const} qualifier ensure that the returned value will not be changed under any circumstances. It may be considered as a fail-safe method of keep value unchanged.
+
+\alert{getTotalProfileCount} static function was created to gain access to the private static field \alert{NUMBER\_STUDENT\_PROFILE\_CREATED}.
+
+We know how to write function definition outside of class, I am going to apply the same method to write the source file.
+
+\alert{StudentProfile.cpp}
+
+\begin{verbatim}
+
+#include "StudentProfile.h"
+
+int StudentProfile::NUMBER_STUDENT_PROFILE_CREATED = 0;
+
+StudentProfile::StudentProfile(string name, int id, float cg){
+    this->name = name;
+    this->id = id;
+    this->cgpa = cg;
+    //Since constructors are called automatically, if a object is created we can increase the profile count by 1 to keep track the total number of student profile
+    StudentProfile::NUMBER_STUDENT_PROFILE_CREATED++;
+}
+
+string StudentProfile::getName () const {
+    return this->name;
+}
+
+int StudentProfile::getId () const {
+    return this->id;
+}
+
+float StudentProfile::getCGPA () const {
+    return this->cgpa;
+}
+
+int StudentProfile::getTotalProfileCount() {
+    return StudentProfile::NUMBER_STUDENT_PROFILE_CREATED;
+}
+\end{verbatim}
+
+\alert{main.cpp}
+
+\begin{verbatim}
+int main(int argc, char *argv[])
+{
+    StudentProfile profile1("name1", 1, 1.00);
+    StudentProfile profile2("name2", 2, 2.00);
+    cout << StudentProfile::getTotalProfileCount () << endl;
+}
+\end{verbatim}
+
+
+
+\end{frame}
+
 
 \end{document}
